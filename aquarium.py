@@ -1,8 +1,17 @@
 import math
 import random
+import pickle 
 
 pi = math.pi
+def load_aquario(aquarioname = 'aguario'):
+     with open('aquario/'+aquarioname+".pkl", 'rb') as m:
+        aquario = pickle.load(m)
+        return aquario
 
+def save_aquario(aquarior, name="aguario"):
+    with open("aquario/"+name+'.pkl', 'wb') as outp:
+        pickle.dump(aquarior, outp, pickle.HIGHEST_PROTOCOL)
+    
 def randomizer():
         return [random.randint(0, 9), random.randint(0, 9), random.uniform(0, 2*pi)]
     
@@ -11,7 +20,7 @@ class aquarium():
         self.height = aquariumHeight
         self.width = aquariumWidth
         self.objList = []
-        
+
 class wobject():
     def __init__(self, x = 0, y = 0, appearance = 'abracadabra'):
         self.x = x
@@ -141,10 +150,10 @@ class fish():
 #e recarregar este aquário quando uma chamada é feita.
 #enviando os dados para o navegador
 
-aquario = aquarium(100, 100)
-
 def tick():
+  aquario = load_aquario()
   for peixe in [peixe for peixe in aquario.objList if isinstance(peixe, fish)]:
+        aquario = load_aquario()
         peixe.see(aquario)
         peixe.createMemory()
         act = peixe.remember()
@@ -154,9 +163,11 @@ def tick():
         peixe.move(act, aquario)
         #peixe.hurt()
         peixe.stopMemoryAndSave()
+        save_aquario(aquario)
+        return get_aquarium()
 
 def jogar_racao(x = None, y = None):
-        
+    aquario = load_aquario()
     for peixe in aquario.objList:
         if x == None:
             x = peixe.x+1
@@ -164,28 +175,26 @@ def jogar_racao(x = None, y = None):
             y = peixe.y+1
             racao = wobject(x, y, 'ração')
             aquario.objList.append(racao)
+    save_aquario(aquario)
 
 def create_fish(appearance, energy = 10, x = 0, y = 0):
+    aquario = load_aquario()
     newFish = fish(energy, x, y, 0, appearance)
     aquario.objList.append(newFish)
+    save_aquario(aquario)
 
 def get_aquarium():
-    return aquario.objList
+    aquario = load_aquario()
+    generalAquarium = []
+    for thing in aquario.objList:
+         thingArray = []
+         thingArray.append(thing.x)
+         thingArray.append(thing.y)
+         thingArray.append(thing.appearance)
+         if type(thing) == fish:
+              thingArray.append(thing.angle)
+              thingArray.append(thing.energy)
+              thingArray.append(thing.radius)
 
-
-jeraldo = fish()
-aquario.objList.append(jeraldo)
-jeraldo.see(aquario)
-jeraldo.createMemory()
-act = jeraldo.remember()
-print(act)
-jeraldo.eat(aquario)
-jeraldo.move(act, aquario)
-#jeraldo.hurt()
-jeraldo.stopMemoryAndSave()
-
-
-mario = fish(5, jeraldo.x+1,jeraldo.y,90,'Andrade')
-luigi = fish(5, jeraldo.x-1,jeraldo.y,0,'Mansion')
-aquario.objList.append(mario)
-aquario.objList.append(luigi)
+         generalAquarium.append(thingArray)
+    return generalAquarium

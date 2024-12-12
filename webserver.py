@@ -1,5 +1,4 @@
 import json
-from crypt import methods
 
 import aquarium
 from flask import Flask, jsonify, request
@@ -30,5 +29,10 @@ def give_food():
 
 @app.route('/getaquarium', methods=['GET'])
 def get_aquarium():
-    return aquarium.get_aquarium()
+    return json.dumps(aquarium.get_aquarium())
 
+@app.route('/tick', methods = ['PATCH'])
+def tick():
+     return json.dumps(aquarium.tick())
+    
+app.run()
